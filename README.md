@@ -20,8 +20,8 @@ Add it during the setup wizard (**Stack Sources** step) or later under
 
 | Product | Description | Version | Stacks |
 |---------|-------------|---------|--------|
-| [ams.project](ams-project/) | Enterprise Project Management System | 4.0.0-preview.1 | 16 |
-| [IdentityAccess](ams-identityaccess/) | Standalone Identity Provider | 3.2.0 | 1 |
+| [ams.project](ams-project/4.0/) | Enterprise Project Management System | 4.0.0-preview.1 | 16 |
+| [IdentityAccess](ams-identityaccess/3.2/) | Standalone Identity Provider | 3.2.0 | 1 |
 
 > IdentityAccess ships at its own released version (`3.2.0`, `linux-v3.2.0`) — it is a
 > separately versioned product and is **not** previewed together with ams.project.
@@ -40,4 +40,4 @@ Standalone identity provider (IdentityServer / AdminPortal / ClientHub / EmailSe
 
 ## Stack Format
 
-Each product is a directory containing a `stack.yaml` file in the [RSGO Manifest Format](https://github.com/Wiesenwischer/ReadyStackGo). Multi-stack products use `include` references to organize sub-stacks.
+Each product is organised **per minor version** (`ams-project/4.0/`, `ams-identityaccess/3.2/`), with a `stack.yaml` file in the [RSGO Manifest Format](https://github.com/Wiesenwischer/ReadyStackGo) in each version directory. Patch releases (e.g. 4.0.0 → 4.0.1) update the same directory; a new directory is added only for a new minor/major version. Multi-stack products use `include` references to organize sub-stacks.
