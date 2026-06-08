@@ -6,15 +6,6 @@ metadata:
   description: Identity Provider services (IdentityServer, AdminPortal, ClientHub, EmailSender)
 
 variables:
-  # IdentityAccess Database
-  IDENTITY_ACCESS_DB:
-    label: IdentityAccess Database Connection
-    description: SQL Server connection string for IdentityAccess
-    type: SqlServerConnectionString
-    required: true
-    group: Database
-
-
   # Email Settings
   MAIL_SERVER:
     label: Mail Server
@@ -59,14 +50,6 @@ variables:
     group: Email
 
 
-  # Service Bus
-  SERVICE_BUS_CATALOG:
-    label: Service Bus Catalog
-    description: SQL Server catalog for NServiceBus transport
-    type: String
-    required: true
-    group: Advanced
-
   # Logging
   LOG_MAX_SIZE:
     label: Log Max Size
@@ -84,6 +67,31 @@ variables:
 
 
 services:
+  identityaccess-migrator:
+    image: amssolution/identityaccess.migrator:linux-v3.2.0
+    containerName: identityaccess-migrator
+    lifecycle: init
+    environment:
+      DB_SERVER: ${DB_SERVER}
+      DB_NAME: ${DB_NAME}
+      DB_PARAMS: ${DB_PARAMS}
+      DB_ADMIN_USER: ${DB_ADMIN_USER}
+      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD}
+      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
+      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
+      DB_TRANSPORT_NAME: ${DB_TRANSPORT_NAME}
+      # Client URL seeding — the ConfigurationDbContextSeed in this migrator
+      # reads ClientUrls from IConfiguration and writes the resulting redirect
+      # URIs into IdentityAccess.ClientRedirectUris. These MUST live on the
+      # migrator service, not on identity-api, because the IdentityServer
+      # runtime does not re-seed clients at start.
+      ClientUrls__ProjectDesktop: http://localhost/wpf
+      ClientUrls__ProjectDesktopV2: http://localhost/wpf
+      ClientUrls__WebBffBaseUrls__0: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:5000
+      ClientUrls__ReactClientBaseUrls__0: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:5000
+    networks:
+      - ams-project-identity
+
   identity-api:
     image: amssolution/identityaccess.identityserver:linux-v3.2.0
     containerName: identity-api
@@ -92,7 +100,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:80
-      ConnectionStrings__IdentityAccess: ${IDENTITY_ACCESS_DB}
       DB_SERVER: ${DB_SERVER}
       DB_NAME: ${DB_NAME}
       DB_PARAMS: ${DB_PARAMS}
@@ -106,11 +113,7 @@ services:
       Serilog__MinimumLevel: ${LOG_LEVEL}
       CertificatePath: /etc/ssl/certs/identity-api.pfx
       CertificatePassword: P@ssw0rd!
-      SERVICE_BUS_CATALOG: ${SERVICE_BUS_CATALOG}
-      ClientUrls__ProjectDesktop: http://localhost/wpf
-      ClientUrls__ProjectDesktopV2: http://localhost/wpf
-      ClientUrls__WebBffBaseUrls__0: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:5000
-      ClientUrls__ReactClientBaseUrls__0: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:5000
+      DB_TRANSPORT_NAME: ${DB_TRANSPORT_NAME}
     volumes:
       - profilePictures:/app/wwwroot/picture
     networks:
@@ -129,7 +132,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:80
-      ConnectionStrings__IdentityAccess: ${IDENTITY_ACCESS_DB}
       DB_SERVER: ${DB_SERVER}
       DB_NAME: ${DB_NAME}
       DB_PARAMS: ${DB_PARAMS}
@@ -141,7 +143,7 @@ services:
       IdentityServerUrl: http://identity-api
       Serilog__LogstashUrl: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:8080
       Serilog__MinimumLevel: ${LOG_LEVEL}
-      SERVICE_BUS_CATALOG: ${SERVICE_BUS_CATALOG}
+      DB_TRANSPORT_NAME: ${DB_TRANSPORT_NAME}
     networks:
       - ams-project-identity
     restart: unless-stopped
@@ -158,7 +160,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:80
-      ConnectionStrings__IdentityAccess: ${IDENTITY_ACCESS_DB}
       DB_SERVER: ${DB_SERVER}
       DB_NAME: ${DB_NAME}
       DB_PARAMS: ${DB_PARAMS}
@@ -168,7 +169,7 @@ services:
       ExitOnCriticalError: ${EXIT_ON_CRITICAL_ERROR}
       Serilog__LogstashUrl: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:8080
       Serilog__MinimumLevel: ${LOG_LEVEL}
-      SERVICE_BUS_CATALOG: ${SERVICE_BUS_CATALOG}
+      DB_TRANSPORT_NAME: ${DB_TRANSPORT_NAME}
     networks:
       - ams-project-identity
     restart: unless-stopped
@@ -185,7 +186,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://0.0.0.0:80
-      ConnectionStrings__IdentityAccess: ${IDENTITY_ACCESS_DB}
       DB_SERVER: ${DB_SERVER}
       DB_NAME: ${DB_NAME}
       DB_PARAMS: ${DB_PARAMS}
@@ -202,7 +202,7 @@ services:
       EmailSettings__IsAuthenticationRequired: ${MAIL_IS_AUTHENTICATION_REQUIRED}
       Serilog__LogstashUrl: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:8080
       Serilog__MinimumLevel: ${LOG_LEVEL}
-      SERVICE_BUS_CATALOG: ${SERVICE_BUS_CATALOG}
+      DB_TRANSPORT_NAME: ${DB_TRANSPORT_NAME}
     networks:
       - ams-project-identity
     restart: unless-stopped
