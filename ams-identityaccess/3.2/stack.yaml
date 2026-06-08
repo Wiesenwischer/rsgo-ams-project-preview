@@ -6,7 +6,7 @@
 # declared in the identity-access.yaml fragment next to this file.
 
 metadata:
-  name: IdentityAccess
+  name: ams.identityaccess
   productId: com.ams-erp.project.identityaccess
   description: IdentityServer-based identity provider for AMS products
   productVersion: "3.2.0"
