@@ -1,0 +1,77 @@
+# IdentityAccess ReadyStackGo Manifest
+# Identity Provider (IdentityServer / AdminPortal / ClientHub / EmailSender)
+#
+# Lives as its own RSGO product so operators can deploy / upgrade IdentityAccess
+# independently of the larger ams.project stack. The actual services are
+# declared in the identity-access.yaml fragment next to this file.
+
+metadata:
+  name: IdentityAccess
+  productId: com.ams-erp.identityaccess
+  description: IdentityServer-based identity provider for AMS products
+  productVersion: "3.2.0"
+  author: ams solution GmbH
+  category: Identity
+  tags:
+    - ams
+    - identityaccess
+    - oauth2
+    - oidc
+
+sharedVariables:
+  AMS_IDENTITY_EXTERNAL_DNS_NAME_OR_IP:
+    label: External DNS/IP
+    description: External DNS name or IP exposed by the IdentityServer reverse proxy
+    type: String
+    default: host.docker.internal
+    required: true
+    group: Network
+
+  IDENTITY_SERVER_PORT:
+    label: Identity Server Port
+    description: External port for IdentityServer
+    type: Number
+    default: "7614"
+    group: Network
+
+  ASPNETCORE_ENVIRONMENT:
+    label: ASP.NET Core Environment
+    description: Runtime environment for ASP.NET Core services
+    type: Select
+    options:
+      - value: Development
+        label: Development
+      - value: Staging
+        label: Staging
+      - value: Production
+        label: Production
+    default: Production
+    group: General
+
+  LOG_LEVEL:
+    label: Log Level
+    description: Minimum log level for Serilog
+    type: Select
+    options:
+      - value: Verbose
+        label: Verbose
+      - value: Debug
+        label: Debug
+      - value: Information
+        label: Information
+      - value: Warning
+        label: Warning
+      - value: Error
+        label: Error
+      - value: Fatal
+        label: Fatal
+    default: Information
+    group: Logging
+
+stacks:
+  identity-access:
+    include: identity-access.yaml
+
+networks:
+  ams-identity-backend:
+    driver: bridge
