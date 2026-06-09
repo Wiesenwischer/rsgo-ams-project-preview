@@ -1,9 +1,9 @@
 # Platform Stack Fragment
-# Core platform services (Web BFF, Desktop Gateways, ClientHub, Admin Portal)
+# Core platform services (Web BFF, Desktop Gateways, Admin Portal)
 
 metadata:
   name: Platform
-  description: Platform services (Web BFF, Desktop API Gateway, Composition Gateway, ClientHub, Admin Portal)
+  description: Platform services (Web BFF, Desktop API Gateway, Composition Gateway, Admin Portal)
 
 variables:
   Authentication__RequireHttpsMetadata:
@@ -145,34 +145,6 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       Urls__ProjectManagement: http://projectmanagement-api:8080
       Urls__SalesOrders: http://salesorders-api:8080
-      Serilog__MinimumLevel: ${LOG_LEVEL}
-    networks:
-      - ams-project-backend
-    restart: unless-stopped
-    healthCheck:
-      type: http
-      path: /hc
-      port: 8080
-      test: ["CMD", "curl", "-f", "http://localhost:8080/hc"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      startPeriod: 40s
-
-  clienthub:
-    image: amssolution/itops.clienthub:linux-v4.0.0-preview.1
-    containerName: clienthub
-    environment:
-      ASPNETCORE_URLS: http://0.0.0.0:8080
-      ASPNETCORE_HTTP_PORTS: "8080"
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      DB_SERVER: ${DB_SERVER}
-      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
-      DB_NAME_TRANSPORT: ${DB_NAME_TRANSPORT}
-      DB_PARAMS: ${DB_PARAMS}
-      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
-      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
-      ConnectionStrings__ams: "Data Source=${DB_SERVER};Initial Catalog=${DB_NAME_PERSISTENCE};User ID=${DB_RUNTIME_USER};Password=${DB_RUNTIME_PASSWORD};${DB_PARAMS}"
       Serilog__MinimumLevel: ${LOG_LEVEL}
     networks:
       - ams-project-backend

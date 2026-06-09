@@ -31,7 +31,7 @@ Add it during the setup wizard (**Stack Sources** step) or later under
 Multi-stack product with Infrastructure, Platform, IdentityAccess and Business Services organized by bounded context:
 
 - **Infrastructure** — EventStore, EventStoreDB, Redis
-- **Platform** — Web BFF, Desktop Gateways, ClientHub, Admin Portal, Customer Documentation Portal
+- **Platform** — Web BFF, Desktop Gateways, Admin Portal, Customer Documentation Portal
 - **Business Services** — ProjectManagement, Discussions, Memo, SalesOrders, Export, ERP Integration, Capacity Planning, Production Planning, Reporting, Project Exporting, Project Import, Public API, Analytics, TaskContext
 
 ### ams.identityaccess
