@@ -50,62 +50,6 @@ services:
       retries: 3
       startPeriod: 40s
 
-  planning-capacityutilization-api:
-    image: amssolution/planning.capacityutilization.api:linux-v4.0.0-preview.1
-    containerName: planning-capacityutilization-api
-    environment:
-      ASPNETCORE_URLS: http://0.0.0.0:8080
-      ASPNETCORE_HTTP_PORTS: "8080"
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      DB_SERVER: ${DB_SERVER}
-      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
-      DB_NAME_TRANSPORT: ${DB_NAME_TRANSPORT}
-      DB_NAME_ERP: ${DB_NAME_ERP}
-      DB_PARAMS: ${DB_PARAMS}
-      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
-      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
-      Serilog__MinimumLevel: ${LOG_LEVEL}
-    networks:
-      - ams-project-backend
-    restart: unless-stopped
-    healthCheck:
-      type: http
-      path: /hc
-      port: 8080
-      test: ["CMD", "curl", "-f", "http://localhost:8080/hc"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      startPeriod: 40s
-
-  planning-typecurve-api:
-    image: amssolution/planning.typecurve.api:linux-v4.0.0-preview.1
-    containerName: planning-typecurve-api
-    environment:
-      ASPNETCORE_URLS: http://0.0.0.0:8080
-      ASPNETCORE_HTTP_PORTS: "8080"
-      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
-      DB_SERVER: ${DB_SERVER}
-      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
-      DB_NAME_TRANSPORT: ${DB_NAME_TRANSPORT}
-      DB_NAME_ERP: ${DB_NAME_ERP}
-      DB_PARAMS: ${DB_PARAMS}
-      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
-      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
-      Serilog__MinimumLevel: ${LOG_LEVEL}
-    networks:
-      - ams-project-backend
-    restart: unless-stopped
-    healthCheck:
-      type: http
-      path: /hc
-      port: 8080
-      test: ["CMD", "curl", "-f", "http://localhost:8080/hc"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      startPeriod: 40s
-
   wage-data-api:
     image: amssolution/wage.wagedata.api:linux-v4.0.0-preview.1
     containerName: wage-data-api
