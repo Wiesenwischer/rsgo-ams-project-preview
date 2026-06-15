@@ -1,0 +1,43 @@
+# Analytics Context Fragment
+
+metadata:
+  name: Analytics
+  description: Analytics bounded context services
+
+services:
+  analytics-web:
+    image: amssolution/analytics-web:linux-v4.0.0-preview.2
+    containerName: analytics-web
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      NEXT_PUBLIC_API_BASE_URL: http://${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}:${BFF_PORT}
+      BFF_INTERNAL_URL: http://web-bff:8080
+      HOSTNAME: "0.0.0.0"
+      # Analytics ist read-only DB-Consumer (keine NSB-Queues) — nur
+      # DB_NAME_PERSISTENCE durchreichen; kein TRANSPORT, kein ERP, keine
+      # Admin-Credentials. libraries/db.ts ruft dbConfig.buildAmsDbFromParts
+      # auf und komponiert daraus den Connection-String — read-only-Pendant
+      # zum C#-Building-Block Database.Configuration.AddDatabaseConnectionStrings(),
+      # den projectmanagement.yaml / salesorders.yaml etc. ebenfalls nutzen.
+      DB_SERVER: ${DB_SERVER}
+      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
+      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
+      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
+      DB_PARAMS: ${DB_PARAMS}
+    networks:
+      - ams-project-backend
+    restart: unless-stopped
+    healthCheck:
+      type: http
+      path: /analytics/hc
+      port: 3000
+      test: ["CMD", "curl", "-f", "http://localhost:3000/analytics/hc"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      startPeriod: 40s
+
+
+networks:
+  ams-project-backend:
+    external: true
