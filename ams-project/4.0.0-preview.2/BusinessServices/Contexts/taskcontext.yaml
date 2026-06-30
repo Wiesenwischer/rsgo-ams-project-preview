@@ -48,9 +48,9 @@ services:
       Authentication__Audience: api://taskcontext
       # Authority is reached over internal HTTP behind the reverse proxy, so
       # HTTPS-metadata validation must stay off unless the stack is fronted by
-      # HTTPS. Shares the stack-wide Authentication__RequireHttpsMetadata
-      # sharedVariable (stack.yaml); explicit :-false fallback because RSGO does
-      # not always honour the variable default when no user-override is set.
+      # HTTPS. Shares the platform-wide Authentication__RequireHttpsMetadata
+      # knob; explicit :-false fallback because RSGO does not always honour the
+      # variable default when no user-override is set.
       Authentication__RequireHttpsMetadata: "${Authentication__RequireHttpsMetadata:-false}"
       Serilog__MinimumLevel: ${LOG_LEVEL}
     networks:

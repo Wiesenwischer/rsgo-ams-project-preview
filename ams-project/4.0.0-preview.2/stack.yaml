@@ -38,6 +38,7 @@ sharedVariables:
     default: "5000"
     group: Network
 
+
   # Database Configuration
   DB_SERVER:
     label: DB Server
@@ -163,20 +164,6 @@ sharedVariables:
     required: true
     group: ERP
 
-  # Authentication
-  # Stack-wide knob: must live here (product-level sharedVariables) — NOT in the
-  # Platform fragment — so every fragment (web-bff, taskcontext, erpintegration,
-  # …) can resolve it. Services still reference it as
-  # ${Authentication__RequireHttpsMetadata:-false} because RSGO does not reliably
-  # honour this default: when an empty user-override is present (same reason the
-  # ERP_*_ALIAS usages keep their :- fallbacks).
-  Authentication__RequireHttpsMetadata:
-    label: Require HTTPS Metadata
-    description: Whether services require HTTPS for OIDC/JWT metadata retrieval. Keep false when the authority is reached over internal HTTP behind the reverse proxy.
-    type: Boolean
-    default: "false"
-    group: Authentication
-
   # Database Credentials
   DB_ADMIN_USER:
     label: DB Admin User
@@ -207,24 +194,13 @@ sharedVariables:
     group: Database
 
   # Admin Portal
-  ADMIN_INITIAL_USER_ID:
-    label: Initial Admin User ID
-    description: User ID for the initial administrator (from Identity Provider)
-    type: String
-    default: ""
-    group: Admin
-
-  ADMIN_INITIAL_USER_NAME:
-    label: Initial Admin User Name
-    description: Display name for the initial administrator
-    type: String
-    default: ""
-    group: Admin
-
   ADMIN_INITIAL_EMAIL:
     label: Initial Admin Email
-    description: Email for the initial administrator
-    type: String
+    description: >-
+      E-mail of the initial platform administrator. On a fresh installation the first
+      user who signs in (via any configured IdP) with exactly this e-mail is promoted
+      to platform admin. Leave empty to disable the auto-bootstrap.
+    type: Email
     default: ""
     group: Admin
 
@@ -290,6 +266,32 @@ maintenance:
     maintenanceValue: "1"
     normalValue: "0"
     pollingInterval: 30s
+  # No setter: ams.project is a READ-ONLY observer of the maintenance flag. The flag is the legacy ERP's
+  # shared-DB maintenance signal (ERP sets it for exclusive DB access, e.g. a DB update, and clears it when
+  # done). ams.project must never write it — ERP owns set+clear. ams.project's own updates run via RSGO
+  # redeploy/operation-mode, not via this flag. (PLAN-114: webhook/SQL setter removed — caused a
+  # deactivation deadlock and wrongly made ams.project a writer of ERP's flag.)
+
+# Maintenance Edge (PLAN-114) - RSGO-managed reverse-proxy that survives product redeploys.
+# Public front-door on ${BFF_PORT}: proxies to the BFF while the product runs, and serves a
+# maintenance page + machine-readable GET /__status while it is stopped or being redeployed.
+# HTTP for now (no `tls:` block). TLS termination (tls.mode: reuse — shared hostname with RSGO)
+# is a later, separately-coordinated step (OIDC/CORS/WebBffUrl + IdentityServer redirect-URI flip).
+edge:
+  enabled: true
+  publicHostname: ${AMS_PROJECT_EXTERNAL_DNS_NAME_OR_IP}
+  publicPort: ${BFF_PORT}
+  upstream:
+    service: web-bff
+    port: 8080
+  network: ams-project-edge
+  maintenancePage:
+    mode: default
+    branding:
+      productName: ams.project
+      locales:
+        - de
+        - en
 
 stacks:
   # Core Stacks
@@ -344,4 +346,7 @@ networks:
   ams-project-backend:
     driver: bridge
   ams-project-infra:
+    driver: bridge
+  # PLAN-114: shared network for the maintenance edge ↔ BFF (referenced external:true in platform.yaml).
+  ams-project-edge:
     driver: bridge
