@@ -81,10 +81,10 @@ sharedVariables:
     group: Database
 
   DB_TRANSPORT_NAME:
-    label: Transport DB Name
-    description: Database name for NServiceBus transport (queues, subscriptions). Shared across bounded contexts.
+    label: Transport DB Name (optional)
+    description: Optional shared catalog for cross-context NServiceBus pub/sub. When set, only the shared dbo.SubscriptionRouting table lives here. Leave blank to run IdentityAccess self-contained in its own database.
     type: String
-    required: true
+    required: false
     group: Database
 
   # Environment Configuration
