@@ -1,7 +1,7 @@
 # Release Notes 4.0 (English)
 
 > Major release · changes since version **3.0.2**
-> **Note:** These release notes cover the current preview state and have so far been generated up to and including **4.0.0-preview.2**. They will be extended with the upcoming preview/RC builds through the final 4.0.0.
+> **Note:** These release notes cover the current preview state and have so far been generated up to and including **4.0.0-preview.4**. They will be extended with the upcoming preview/RC builds through the final 4.0.0.
 
 4.0 is a **major release**. At its core is a **completely rebuilt scheduling engine** modeled on Microsoft Project, together with a thoroughly modernized interface, new web modules (reports, capacity, collaboration), a new **administration portal** and a new installation/rollout mechanism.
 
@@ -33,6 +33,7 @@ The schedule calculation was rebuilt from the ground up (Critical Path Method, f
 - **Automatic or manual** scheduling per task: manually pinned tasks keep their dates but still participate in conflict detection.
 - **Milestones** with correct time-of-day handling and clean behavior on non-working days.
 - **New warnings and messages column (indicators)** in the Gantt: a dedicated column shows every note per task at a glance – scheduling warnings (unmet constraints, negative slack, predecessor/successor conflicts, dates snapped to working days) as well as ERP sync notices (date drift or overrun). Each icon has an explanatory tooltip, so problems can be spotted and fixed immediately.
+- **Warnings update live**: changes to constraints, dates or dependencies immediately refresh the indicator column and the warning counter in the status bar – no need to reload the plan. Warnings are attributed to the actual cause (the same conflict is no longer reported on several tasks).
 
 > 📝 **Note**: Because 4.0 introduces a new scheduling engine, existing projects are migrated to the new engine on upgrade.
 
@@ -50,6 +51,7 @@ The schedule calculation was rebuilt from the ground up (Critical Path Method, f
 - **New schedule selection page**: a central landing page for picking and opening schedules – either as a **card view** or a **sortable table view** (toggleable, the choice is persisted).
 - **Search and filters** by project name, manager, clerk, business unit and revision, plus **status tabs** (All / Active / Archived) with counts.
 - **Archive a project**: schedules can be archived right from the project list. Archived projects appear under the "Archived" tab and are kept read-only. Archiving runs asynchronously with real-time progress.
+- **Creator and creation date** of a schedule are captured and shown in the project list.
 
 ## Create a project from a sales order/offer
 
@@ -72,6 +74,8 @@ The schedule calculation was rebuilt from the ground up (Critical Path Method, f
 
 - A task's detail area is new and web-based, embedded in the desktop client (WebView2).
 - Tabs for **predecessors**, **discussion**, **notes (memo)** and **bill of materials (BOM)**.
+- **Extended predecessor tab**: a **conflict-count badge** on the tab, **conflict-kind icons** with explanatory tooltips, the **lag unit** shown on the fields, **double-click** a predecessor to jump to it, and **removing a predecessor can be undone**.
+- **Rename a task title by clicking** it directly in the detail view.
 - A task's constraints/dates are maintained here, consistent with the new scheduling.
 - The detail view can be **detached into its own window** that reliably stays in the foreground.
 - A stuck or hidden detail area can be recovered at any time via **"Reset detail area"**; the conflicts pane is now scrollable.
@@ -82,7 +86,7 @@ The schedule calculation was rebuilt from the ground up (Critical Path Method, f
 - **Interactive charts**: hot-edit, drill-down, hyperlinks, print and **PDF export** directly from the analysis page.
 - **Enhanced PDF export** of reports: configurable margins, page numbers, "fit to width" and optional splitting of large charts across multiple pages (N × M).
 - **Capacity report** with clearer charts: configurable chart size and column count, drop-downs for report type/grouping, available-capacity and capacity-factor lines, and clearly highlighted overload notices.
-- **Capacity planning** with new web booking dialogs (actual hours, percent complete, production marker).
+- **Capacity planning** with new web booking dialogs (actual hours, percent complete, production marker); the resource grid additionally shows **order and line item**, and the personnel number can be prefilled via a link (URL parameter).
 
 ## Collaboration
 
@@ -94,6 +98,7 @@ The schedule calculation was rebuilt from the ground up (Critical Path Method, f
 
 - Copy tasks including **subtasks** – or **subtasks only**, without the head task.
 - Optionally **include notes** when copying.
+- **Visual feedback** in the Gantt: copied and pasted tasks are briefly highlighted, so it is immediately clear what was copied and where it was pasted.
 
 ## Interface, language & usability
 
@@ -116,6 +121,7 @@ Alongside the application itself there is now a dedicated, web-based **administr
 - **Error/queue management**: failed background operations are shown clearly and can be **retried or discarded** individually.
 - **mandant.ini import**: existing tenant settings can be read in and applied via a dialog.
 - **Client rollout from the portal**: the desktop client can be deployed directly from the portal to a network path – with **live progress**.
+- **Bulk revision**: all active projects can be revised in a single run from the portal (the "Revisions" menu item).
 
 ## Installation & operations *(for administrators)*
 
@@ -130,6 +136,8 @@ Beyond the headline features, 4.0 includes numerous refinements and bug fixes:
 **Opening & session**
 - Projects open reliably even after longer periods of inactivity – the session is refreshed automatically instead of failing with a sudden sign-out error.
 - Schedules open reliably in distributed installations, too (an internally missing connection detail is now fully resolved).
+- The session now survives a **server restart**: security keys and the session store are held centrally, so a restart no longer signs everyone out. The session also stays active beyond the plain access-token lifetime.
+- When the sign-in has expired, the desktop client first attempts a **silent re-login** before prompting; transient connection errors to the server are caught and shown as a **friendly message** instead of aborting with an error dialog.
 
 **Scheduling**
 - Date-bound milestones (start/finish no earlier/later than) keep their day on non-working days, or move correctly to the next working day.
@@ -137,6 +145,10 @@ Beyond the headline features, 4.0 includes numerous refinements and bug fixes:
 - Summary tasks no longer produce spurious "snapped to working day" notices.
 - Predecessor/successor links are shown reliably in the overview.
 - Dates that cannot be met are consistently shown as negative slack with a warning (MS-Project-conformant).
+- Negative slack is attributed to its **actual cause**: predecessors or successors of an unmeetable "no later than" constraint no longer get their own misleading slack warning.
+- The **warning counter in the status bar matches the warning icons in the Gantt** – the same conflict is no longer counted twice.
+- Warnings appear **live**, without reloading the plan.
+- A **start-to-start successor** of an end-of-day milestone keeps the shared start date; a **duration change on a manually scheduled task** re-schedules its finish correctly.
 
 **ERP integration**
 - Correct labels and type icons, including for live-created ERP tasks.
@@ -149,6 +161,7 @@ Beyond the headline features, 4.0 includes numerous refinements and bug fixes:
 - More robust PDF export: the export dialog no longer closes accidentally, works in kiosk mode and exports all charts.
 - Correct German date format in the export columns.
 - Overload notices are shown correctly even at 0 hours; stable, consistent label colors across all capacity charts.
+- Fixed an infinite loop in the capacity calculation of large work plans; the capacity overview is sorted chronologically and falls back per work center on overload.
 
 **Administration portal**
 - Language switching (DE/EN) works reliably; sign-out button and display of the actually signed-in user.
@@ -162,7 +175,16 @@ Beyond the headline features, 4.0 includes numerous refinements and bug fixes:
 - Leaving a plan cleanly closes the active plan and its menus.
 - Copy/paste of notes: fixed a crash on paste.
 - Notes: clearing a note removes the note icon from the table.
-- The bill-of-materials list now sorts the task ID numerically instead of alphanumerically.
+- The bill-of-materials list now sorts the task ID numerically instead of alphanumerically; the bill-of-materials view no longer opens empty (stale persisted page size), and the assignment grids are capped at 500 rows.
+- Fixed a **desktop client startup crash** (clipboard status bar).
+- Projects **without tasks** now show their menus and an empty detail area instead of a stuck state; flicker of the detail view on identical live updates is fixed.
+- The **conflicts/warnings pane** and the **WPF menu** follow dark mode; various layout fixes in the project list (headroom for the scrollbar, context menu in the merged Status column, grid stays within the window width).
+
+**Collaboration**
+- The notes and discussion panes were reworked with the consistent design system: readable message bubbles, an always-active Send button, no flash-of-unstyled-content on open, and no more spurious scrollbar.
+
+**Administration portal**
+- Bulk revision of all active projects from the portal; the mandant.ini import ships production defaults and derives the ERP root directory.
 
 **Installation**
 - Numerous robustness improvements to the client installer (on-demand download, prefilling of target directory and tenant number, correct handling of UNC paths and placeholders).
