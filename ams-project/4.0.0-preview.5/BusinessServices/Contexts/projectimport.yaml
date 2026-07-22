@@ -1,0 +1,60 @@
+# ProjectImport Context Fragment
+
+metadata:
+  name: ProjectImport
+  description: Project Import bounded context services
+
+services:
+  projectimport-migrator:
+    image: amssolution/projectimport.migrator:linux-v4.0.0-preview.5
+    containerName: projectimport-migrator
+    lifecycle: init
+    environment:
+      DB_SERVER: ${DB_SERVER}
+      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
+      DB_NAME_TRANSPORT: ${DB_NAME_TRANSPORT}
+      DB_PARAMS: ${DB_PARAMS}
+      DB_ADMIN_USER: ${DB_ADMIN_USER}
+      DB_ADMIN_PASSWORD: ${DB_ADMIN_PASSWORD}
+      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
+      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
+    networks:
+      - ams-project-backend
+
+  projectimport-api:
+    image: amssolution/projectimport.api:linux-v4.0.0-preview.5
+    containerName: projectimport-api
+    ports:
+      - "${PROJECT_IMPORT_PORT}:8080"
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:8080
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      InternalApi__BaseUrl: http://projectmanagement-api:8080
+      InternalApi__AccountingUrl: http://accounting-api:8080
+      InternalApi__MemoUrl: http://memo-api:8080
+      InternalApi__DiscussionUrl: http://discussions-api:8080
+      DB_SERVER: ${DB_SERVER}
+      DB_NAME_PERSISTENCE: ${DB_NAME_PERSISTENCE}
+      DB_NAME_TRANSPORT: ${DB_NAME_TRANSPORT}
+      DB_PARAMS: ${DB_PARAMS}
+      DB_RUNTIME_USER: ${DB_RUNTIME_USER}
+      DB_RUNTIME_PASSWORD: ${DB_RUNTIME_PASSWORD}
+      Serilog__MinimumLevel: ${LOG_LEVEL}
+    networks:
+      - ams-project-backend
+    restart: unless-stopped
+    healthCheck:
+      type: http
+      path: /hc
+      port: 8080
+      test: ["CMD", "curl", "-f", "http://localhost:8080/hc"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      startPeriod: 40s
+
+
+networks:
+  ams-project-backend:
+    external: true
