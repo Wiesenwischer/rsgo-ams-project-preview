@@ -200,11 +200,11 @@ sharedVariables:
     label: Analytics Demo-Daten freischalten
     description: >-
       Nur fuer Testsysteme. Schaltet die Seite /demo-daten frei, mit der sich die Beispieldaten
-      der Dokumentation anlegen und wieder entfernen lassen. Es zaehlt ausschliesslich der Wert
-      "true"; jeder andere Wert und ein leeres Feld lassen die Funktion aus. Zusaetzlich muessen
-      die beiden folgenden Zugangsdaten gesetzt sein, sonst kann nichts geschrieben werden.
-    type: String
-    required: false
+      der Dokumentation anlegen und wieder entfernen lassen. Zusaetzlich muessen die beiden
+      folgenden Zugangsdaten gesetzt sein, sonst kann nichts geschrieben werden. Auf
+      Live-Umgebungen ausgeschaltet lassen.
+    type: Boolean
+    default: "false"
     group: Database
 
   ANALYTICS_DEMO_DB_USER:
