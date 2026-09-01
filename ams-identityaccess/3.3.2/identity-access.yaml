@@ -52,19 +52,19 @@ variables:
   MAIL_USE_SSL:
     label: Mail Encryption
     description: >-
-      Transport encryption for the SMTP connection. Leave on "Automatic" unless the relay
-      needs something else: automatic negotiates STARTTLS when the server offers it, "Off"
-      forces a plain unencrypted connection, and "Implicit SSL" opens the socket with TLS
-      right away (SMTPS, usually port 465 -- set Mail Port accordingly).
+      Transport encryption for the SMTP connection. Leaving the field unselected is the
+      default and keeps the behaviour every installation has today: the EmailSender
+      negotiates STARTTLS whenever the relay offers it. Pick "Off" to force a plain
+      unencrypted connection, or "Implicit SSL" to open the socket with TLS right away
+      (SMTPS, usually port 465 -- set Mail Port accordingly).
     type: Select
     options:
-      - value: ""
-        label: Automatic (STARTTLS when available)
       - value: "false"
         label: "Off (plain SMTP)"
       - value: "true"
         label: Implicit SSL (SMTPS)
     default: ""
+    required: false
     group: Email
     order: 100
 
