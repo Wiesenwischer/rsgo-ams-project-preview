@@ -21,24 +21,6 @@ variables:
     default: "587"
     group: Email
 
-  MAIL_USE_SSL:
-    label: Mail Encryption
-    description: >-
-      Transport encryption for the SMTP connection. Leave on "Automatic" unless the relay
-      needs something else: automatic negotiates STARTTLS when the server offers it, "Off"
-      forces a plain unencrypted connection, and "Implicit SSL" opens the socket with TLS
-      right away (SMTPS, usually port 465 -- set Mail Port accordingly).
-    type: Select
-    options:
-      - value: ""
-        label: Automatic (STARTTLS when available)
-      - value: "false"
-        label: "Off (plain SMTP)"
-      - value: "true"
-        label: Implicit SSL (SMTPS)
-    default: ""
-    group: Email
-
   MAIL_SENDER_NAME:
     label: Mail Sender Name
     description: Display name for outgoing emails
@@ -66,6 +48,25 @@ variables:
     type: Boolean
     default: "false"
     group: Email
+
+  MAIL_USE_SSL:
+    label: Mail Encryption
+    description: >-
+      Transport encryption for the SMTP connection. Leave on "Automatic" unless the relay
+      needs something else: automatic negotiates STARTTLS when the server offers it, "Off"
+      forces a plain unencrypted connection, and "Implicit SSL" opens the socket with TLS
+      right away (SMTPS, usually port 465 -- set Mail Port accordingly).
+    type: Select
+    options:
+      - value: ""
+        label: Automatic (STARTTLS when available)
+      - value: "false"
+        label: "Off (plain SMTP)"
+      - value: "true"
+        label: Implicit SSL (SMTPS)
+    default: ""
+    group: Email
+    order: 100
 
 
   # Logging
