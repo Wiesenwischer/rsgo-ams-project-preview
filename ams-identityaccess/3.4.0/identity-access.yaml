@@ -120,7 +120,7 @@ services:
     # only did so when offline_access appeared in RequestedScopes, which IS4 never
     # populates), so the BFF sizes its token-vault TTL to the refresh-token lifetime
     # instead of the ~1h access-token lifetime. Fixes "Sitzung abgelaufen" ~1h after login.
-    image: amssolution/identityaccess.identityserver:linux-v3.3.2
+    image: amssolution/identityaccess.identityserver:linux-v3.4.0
     containerName: identity-api
     ports:
       - "7614:80"
@@ -152,7 +152,7 @@ services:
       port: 80
 
   adminportal:
-    image: amssolution/identityaccess.adminportal:linux-v3.3.0
+    image: amssolution/identityaccess.adminportal:linux-v3.4.0
     containerName: adminportal
     ports:
       - "7615:80"
@@ -180,7 +180,7 @@ services:
       port: 80
 
   identityaccess-clienthub:
-    image: amssolution/identityaccess.clienthub:linux-v3.3.0
+    image: amssolution/identityaccess.clienthub:linux-v3.4.0
     containerName: identityaccess-clienthub
     ports:
       - "7616:80"
@@ -206,7 +206,7 @@ services:
       port: 80
 
   identityaccess-emailsender:
-    image: amssolution/identityaccess.emailsender:linux-v3.3.0
+    image: amssolution/identityaccess.emailsender:linux-v3.4.0
     containerName: identityaccess-emailsender
     ports:
       - "7617:80"
